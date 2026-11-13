@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171512"><meta name="description" content="Prenota il tuo appuntamento da Ciccio Barber.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/logo.jpg">
+<title>Ciccio Barber — Prenota</title>
+<style>
+:root{--ink:#211e19;--paper:#f2eadb;--cream:#fffaf0;--gold:#a77b43;--muted:#766d60}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,serif}
+header{background:#171512;color:#f7efdf;text-align:center;padding:26px 16px 22px;border-bottom:5px double var(--gold)}
+header img{width:116px;height:116px;object-fit:contain;border-radius:8px;background:white}
+h1{font-size:clamp(27px,6vw,38px);letter-spacing:2px;margin:12px 0 4px;text-transform:uppercase}
+header p{margin:0;color:#d5c6ad;font-style:italic}
+main{max-width:760px;margin:22px auto;padding:0 14px 40px}
+.panel{background:var(--cream);border:1px solid #c9b99e;box-shadow:0 4px 16px #3a2d1a12;padding:20px;margin:14px 0;border-radius:5px}
+h2{font-size:22px;margin:0 0 14px;border-bottom:1px solid #c9b99e;padding-bottom:9px}
+label{display:block;font-weight:bold;margin:12px 0 5px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #b8a88d;border-radius:3px;background:white;font:16px Arial;color:#211e19}
+textarea{min-height:76px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;background:#211e19;color:#fff7e9;padding:13px 16px;border-radius:3px;font-size:16px;font-weight:bold;cursor:pointer}
+button.secondary{background:#80613b}button:disabled{opacity:.45;cursor:not-allowed}
+.service-list{display:grid;gap:8px}.service{display:flex;justify-content:space-between;gap:12px;padding:10px;border-bottom:1px dotted #c9b99e}
+.small{font:13px Arial;color:var(--muted)}.notice{padding:12px;background:#eee3cf;border-left:4px solid var(--gold);font:14px Arial;line-height:1.45}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#confirmation{display:none;background:#e5efdf;border:1px solid #9db38f;padding:14px;margin-top:14px;font:15px Arial}
+footer{text-align:center;color:var(--muted);font:13px Arial;padding:16px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.panel{padding:16px}}
+</style></head>
+<body>
+<header><img src="assets/logo.jpg" alt="Logo Ciccio Barber"><h1>Ciccio Barber</h1><p>Tradizione, stile e cura del dettaglio</p></header>
+<main>
+<section class="panel"><h2>Listino servizi</h2><div id="services" class="service-list"></div><p class="small">I servizi con prezzo “da” richiedono conferma in salone.</p></section>
+<section class="panel"><h2>Prenota il tuo appuntamento</h2>
+<form id="booking">
+<div class="grid"><div><label for="name">Nome e cognome</label><input id="name" required autocomplete="name"></div><div><label for="phone">Telefono</label><input id="phone" required type="tel" autocomplete="tel"></div></div>
+<label for="service">Servizio</label><select id="service" required></select>
+<label for="date">Giorno</label><input id="date" type="date" required>
+<label for="time">Orario disponibile</label><select id="time" required><option value="">Seleziona prima il giorno</option></select>
+<label for="notes">Note (facoltative)</label><textarea id="notes" placeholder="Scrivi qui eventuali richieste..."></textarea>
+<label>Come vuoi pagare?</label><select id="payment"><option value="in_salone">Pago in salone</option><option value="online">Vorrei pagare online</option></select>
+<p class="notice">La scelta “pagamento online” è una preferenza dimostrativa: i pagamenti reali saranno attivati dopo il collegamento a un gestore sicuro. Questa versione non incassa denaro né invia prenotazioni al negozio.</p>
+<button type="submit">Prepara richiesta di prenotazione</button>
+<div id="confirmation" role="status"></div></form></section>
+<section class="panel"><h2>Orari</h2><p><b>Martedì – Sabato</b><br>08:15–12:30 · 15:00–19:30</p><p><b>Lunedì e Domenica</b><br>Chiuso</p><p class="small">Durate iniziali: taglio 30 minuti, barba 15 minuti. Le altre durate sono provvisorie e andranno configurate.</p></section>
+</main><footer>© Ciccio Barber</footer>
+<script>
+const catalog=[
+["Taglio",15,30],["Razor Fade (sfumatura a pelle)",17,30],["Rasatura completa",10,15],["Shampoo",5,15],["Barba",7,15],
+["Modellatura barba (con rasoio)",7,15],["Modellatura barba (con forbici)",10,15],["Tintura",20,60,"da"],["Meches",15,60,"da"],["Stiratura",15,60,"da"]
+];
+const eur=n=>"€ "+Number(n).toFixed(2).replace(".",",");
+const serviceBox=document.querySelector("#services"), serviceSelect=document.querySelector("#service");
+catalog.forEach((s,i)=>{let row=document.createElement("div");row.className="service";row.innerHTML=`<span>${s[0]}</span><b>${s[3]||""} ${eur(s[1])}</b>`;serviceBox.append(row);let o=document.createElement("option");o.value=i;o.textContent=`${s[0]} — ${s[3]||""}${eur(s[1])}`;serviceSelect.append(o)});
+const dateInput=document.querySelector("#date"), timeSelect=document.querySelector("#time");
+const today=new Date();today.setMinutes(today.getMinutes()-today.getTimezoneOffset());dateInput.min=today.toISOString().slice(0,10);
+function slots(){timeSelect.innerHTML="";let d=new Date(dateInput.value+"T12:00:00");if(!dateInput.value||d.getDay()===0||d.getDay()===1){timeSelect.innerHTML='<option value="">Giorno non disponibile</option>';return}
+let duration=catalog[+serviceSelect.value][2]||30, start=new Date(d);let now=new Date();
+[[8,15,12,30],[15,0,19,30]].forEach(([sh,sm,eh,em])=>{let t=sh*60+sm,end=eh*60+em;while(t+duration<=end){let h=Math.floor(t/60),m=t%60;let candidate=new Date(d);candidate.setHours(h,m,0,0);if(candidate>now){let o=document.createElement("option");o.value=`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;o.textContent=o.value;timeSelect.append(o)}t+=duration}});
+if(!timeSelect.options.length)timeSelect.innerHTML='<option value="">Nessun orario disponibile</option>';
+}
+dateInput.addEventListener("change",slots);serviceSelect.addEventListener("change",()=>{if(dateInput.value)slots()});
+document.querySelector("#booking").addEventListener("submit",e=>{e.preventDefault();let s=catalog[+serviceSelect.value];let data={nome:document.querySelector("#name").value,telefono:document.querySelector("#phone").value,servizio:s[0],data:dateInput.value,ora:timeSelect.value,note:document.querySelector("#notes").value,pagamento:document.querySelector("#payment").value};let msg=`Richiesta dimostrativa — Ciccio Barber\nNome: ${data.nome}\nTelefono: ${data.telefono}\nServizio: ${data.servizio}\nData: ${data.data}\nOra: ${data.ora}\nPagamento: ${data.pagamento==="online"?"Online (da attivare)":"In salone"}\nNote: ${data.note||"—"}`;let box=document.querySelector("#confirmation");box.style.display="block";box.textContent="Anteprima creata. Questa demo non ha inviato la prenotazione: copia i dettagli qui sotto e conservali.";let pre=document.createElement("pre");pre.style.whiteSpace="pre-wrap";pre.textContent=msg;box.append(pre);let copy=document.createElement("button");copy.type="button";copy.textContent="Copia dettagli";copy.onclick=()=>navigator.clipboard?.writeText(msg);box.append(copy)});
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script></body></html>

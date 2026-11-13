@@ -1,0 +1,16 @@
+{
+  "name": "Ciccio Barber",
+  "short_name": "Ciccio Barber",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2eadb",
+  "theme_color": "#171512",
+  "icons": [
+    {
+      "src": "assets/logo.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
